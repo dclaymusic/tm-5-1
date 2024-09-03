@@ -1,0 +1,37 @@
+body, button {
+    text-align: center;
+    font-family: monospace;
+    background-color: #adc9fd;
+}
+
+#main-image { 
+    width: 15%;
+}
+
+h1,img {
+    margin: 30px;
+}
+
+button {
+    cursor: pointer;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 2rem;
+}
+
+#decision-div {
+    display: none;
+}
+
+#label-container {
+    display: none;
+}
+
+#decision {
+    font-size: 5rem;
+    margin: 10px;
+}
+
+#decision-percentage {
+    font-weight: bold;
+}
