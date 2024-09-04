@@ -9,7 +9,8 @@
         </script>
     </head>
     <body>
-        <h1>Teachable Machine - 5-1 AI Model<br>(Olivia Neryan)</h1>
+        <h1>Teachable Machine - 5-1 AI Model</h1>
+        <h2>"Olivia Neryan"</h2>
         <img id="main-image" src="img.png">
         <main id="main-div">
             <button id="init-button" type="button" onclick="init()">Is this a TREBLE or a BASS sound?</button>
@@ -53,71 +54,89 @@
                 return recognizer;
             }
 
+            let isRunning = false;
+
             async function init() {
 
-                document.getElementById('decision-div').style.display = 'block';
-                document.getElementById('init-button').style.display = 'none';
+                isRunning = !isRunning;
 
-                const recognizer = await createModel();
-                const classLabels = recognizer.wordLabels(); // get class labels as an array of strings
-
-                //managing label container
-                const labelContainer = document.getElementById("label-container");
-                for (let i = 0; i < classLabels.length; i++) {
-                    labelContainer.appendChild(document.createElement("div"));
-                }
-
-                // listen() takes two arguments:
-                // 1. A callback function that is invoked anytime a word is recognized.
-                // 2. A configuration object with adjustable fields
-                recognizer.listen(result => 
-                
+                if(isRunning)
                 {
-                    // probability of prediction for each class
-                    const scores = result.scores;
+                    document.getElementById('decision-div').style.display = 'block';
+                    // document.getElementById('init-button').style.display = 'none';
+                    document.getElementById('init-button').innerHTML = 'Stop';
+                    document.getElementById('decision').innerHTML = '';
+                    document.getElementById('decision-text').innerHTML = 'I am listening...';
 
-                    //iterate through predictions and note the highest score and it's index number (to match with classLabels)
-                    let hiScore = [0.0, 0];
-                    for(let i = 0; i < classLabels.length; i++) { 
-                        if(result.scores[i] >= hiScore[0])
-                        {
-                            hiScore = [result.scores[i],i];
-                        }
-                    }
 
-                    //if it's background noise, don't print a prediction
-                    if(hiScore[1] == 0) { //if background noise
-                        document.getElementById('decision-text').innerHTML = 'I am listening...';
-                        document.getElementById('decision').style.display = 'none';               
-                    }
-                    else //otherwise print a prediction
-                    {
-                        document.getElementById('decision-text').innerHTML = 'I am <span id=decision-percentage></span>% sure this sound is...';
-                        document.getElementById('decision-percentage').style.display = 'inline';
-                        document.getElementById('decision-percentage').innerHTML = Math.round(hiScore[0]*100);
-                        document.getElementById('decision').style.display = 'block';
-                        document.getElementById('decision').innerHTML = classLabels[hiScore[1]];  
-                    }
-                                      
-                    // render the probability scores per class to the label container
+                    const recognizer = await createModel();
+                    const classLabels = recognizer.wordLabels(); // get class labels as an array of strings
+
+                    //managing label container
+                    const labelContainer = document.getElementById("label-container");
                     for (let i = 0; i < classLabels.length; i++) {
-                        const classPrediction = classLabels[i] + ": " + result.scores[i].toFixed(2);
-                        labelContainer.childNodes[i].innerHTML = classPrediction;
+                        labelContainer.appendChild(document.createElement("div"));
                     }
 
-                }, 
-                
+                    // listen() takes two arguments:
+                    // 1. A callback function that is invoked anytime a word is recognized.
+                    // 2. A configuration object with adjustable fields
+                    recognizer.listen(result => 
+                    
+                    {
+                        // probability of prediction for each class
+                        const scores = result.scores;
+
+                        //iterate through predictions and note the highest score and it's index number (to match with classLabels)
+                        let hiScore = [0.0, 0];
+                        for(let i = 0; i < classLabels.length; i++) { 
+                            if(result.scores[i] >= hiScore[0])
+                            {
+                                hiScore = [result.scores[i],i];
+                            }
+                        }
+
+                        //if it's background noise, don't print a prediction
+                        if(hiScore[1] == 0) { //if background noise
+                            document.getElementById('decision-text').innerHTML = 'I am listening...';
+                            document.getElementById('decision').style.display = 'none';               
+                        }
+                        else //otherwise print a prediction
+                        {
+                            document.getElementById('decision-text').innerHTML = 'I am <span id=decision-percentage></span>% sure this sound is...';
+                            document.getElementById('decision-percentage').style.display = 'inline';
+                            document.getElementById('decision-percentage').innerHTML = Math.round(hiScore[0]*100);
+                            document.getElementById('decision').style.display = 'block';
+                            document.getElementById('decision').innerHTML = classLabels[hiScore[1]];  
+                        }
+                                        
+                        // render the probability scores per class to the label container
+                        for (let i = 0; i < classLabels.length; i++) {
+                            const classPrediction = classLabels[i] + ": " + result.scores[i].toFixed(2);
+                            labelContainer.childNodes[i].innerHTML = classPrediction;
+                        }
+
+                    }, 
+                    
+                    {
+                        includeSpectrogram: true, // in case listen should return result.spectrogram
+                        probabilityThreshold: 0.75,
+                        invokeCallbackOnNoiseAndUnknown: true,
+                        overlapFactor: 0.50 // probably want between 0.5 and 0.75. More info in README
+                    });
+
+                    // Stop the recognition in 5 seconds.
+                    // setTimeout(() => recognizer.stopListening(), 5000);
+                }
+                else
                 {
-                    includeSpectrogram: true, // in case listen should return result.spectrogram
-                    probabilityThreshold: 0.75,
-                    invokeCallbackOnNoiseAndUnknown: true,
-                    overlapFactor: 0.50 // probably want between 0.5 and 0.75. More info in README
-                });
+                    document.getElementById('decision-div').style.display = 'none';
+                    document.getElementById('init-button').innerHTML = "Is this a TREBLE or a BASS sound?";
 
-                // Stop the recognition in 5 seconds.
-                // setTimeout(() => recognizer.stopListening(), 5000);
+                }
+                    
             }
+        
         </script>
-
     </body>
 </html>
